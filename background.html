@@ -20,10 +20,17 @@
 		}
 		
 		else if (request.popup_url) {
+			var protocol = request.popup_url.split('/')[0];
 			var domain = request.popup_url.split('/')[2];
 			var popupHtml = '<html><body>';
 			patterns.forEach(function(pat) {
-				popupHtml += '<a href="" onclick="switchTo(\'' + request.popup_url.replace(domain, pat.domain) + '\');">' + pat.name + '</a><br/>';
+				var replaceDomain = domain;
+				// if explicit protocol in domain
+				if (pat.domain.indexOf('://') != -1) {
+					// replace protocol along with domain
+					replaceDomain = protocol + '//' + domain;
+				}
+				popupHtml += '<a href="" onclick="switchTo(\'' + request.popup_url.replace(replaceDomain, pat.domain) + '\');">' + pat.name + '</a><br/>';
 			});
 			popupHtml += '</body></html>';
 
@@ -32,7 +39,9 @@
     });
 
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-        if (tab.url.split('/')[2] in domains) {
+		var protocol = tab.url.split('/')[0];
+		var domain = tab.url.split('/')[2];
+		if ((domain in domains) || (protocol + '//' + domain in domains)) {
 			chrome.pageAction.show(tabId);
 		}
     });
