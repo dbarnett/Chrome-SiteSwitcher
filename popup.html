@@ -12,6 +12,25 @@ function switchTo(url) {
 	});
 }
 
+function addDomain(domain) {
+	var pats = JSON.parse(localStorage.patterns || '[]');
+	pats.push({'name': domain, 'domain': domain});
+    localStorage.patterns = JSON.stringify(pats);
+    chrome.extension.sendRequest({init_options: true});
+}
+
+function replaceDomain(url, domain) {
+	var protocol = url.split('/')[0];
+	var origDomain = url.split('/')[2];
+	var domainToReplace = origDomain;
+	// if explicit protocol in domain
+	if (domain.indexOf('://') != -1) {
+		// replace protocol along with domain
+		domainToReplace = protocol + '//' + origDomain;
+	}
+	return switchTo(url.replace(domainToReplace, domain));
+}
+
 chrome.tabs.getSelected(null, function(tab) {
 	chrome.extension.sendRequest({popup_url: tab.url}, function(response) {
 		document.getElementsByTagName('body')[0].innerHTML = response.content;
