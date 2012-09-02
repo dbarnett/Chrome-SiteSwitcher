@@ -22,7 +22,7 @@
 		else if (request.popup_url) {
 			var protocol = request.popup_url.split('/')[0];
 			var domain = request.popup_url.split('/')[2];
-			var popupHtml = '<html><body>';
+			var popupHtml = '<html><body><div style="min-width:75px; white-space:nowrap">';
 			patterns.forEach(function(pat) {
 				var replaceDomain = domain;
 				// if explicit protocol in domain
@@ -32,7 +32,7 @@
 				}
 				popupHtml += '<a href="" onclick="switchTo(\'' + request.popup_url.replace(replaceDomain, pat.domain) + '\');">' + pat.name + '</a><br/>';
 			});
-			popupHtml += '</body></html>';
+			popupHtml += '</div></body></html>';
 
 			sendResponse({content: popupHtml});
 		}
